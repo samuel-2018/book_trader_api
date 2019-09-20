@@ -55,7 +55,45 @@ module.exports = (sequelize, DataTypes) => {
     {}
   );
   User.associate = function(models) {
-    // associations can be defined here
+    // Note: Defining the assocation on both models
+    // is required to add or retrieve data.
+
+    User.hasMany(models.Book, {
+      foreignKey: "ownerId"
+    });
+
+    // Note on defining assocations:
+
+    // The 'has' side has its key as
+    // the target key.
+
+    // The 'belongs' side has its key as
+    // the foreign key.
+
+    // 'source' and 'target' are different
+    // for each side of the assocation.
+
+    // The model the function is being
+    // invoked on is the 'source.'
+
+    // The model that is passed as the
+    // argument is the 'target.'
+
+    User.hasMany(models.Request, {
+      as: "requester",
+      // source
+      targetKey: "userId",
+      // target
+      foreignKey: "requesterId"
+    });
+
+    User.hasMany(models.Request, {
+      as: "requestee",
+      // source
+      targetKey: "userId",
+      // target
+      foreignKey: "requesteeId"
+    });
   };
   return User;
 };
