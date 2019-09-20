@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: DataTypes.INTEGER
       },
       title: {
         type: DataTypes.STRING,
@@ -47,7 +47,61 @@ module.exports = (sequelize, DataTypes) => {
   );
   Book.associate = function(models) {
     // Attribute: ownerId
-    Book.belongsTo(models.User, { as: "owner" });
+    Book.belongsTo(models.User, { as: "owner", foreignKey: "ownerId" });
+    // Note: The above inclusion of the foreign
+    // key is needed or Sequelize will become
+    // confused as to what to use for the
+    // column name.
+
+    // REQUEST TABLE
+
+    Book.belongsToMany(models.Request, {
+      as: "giveBooksRequest",
+      through: "give_books_requests",
+      // source
+      foreignKey: "bookId",
+      // target (on join table)
+      otherKey: "requestId",
+      timestamps: false
+    });
+
+    Book.belongsToMany(models.Request, {
+      as: "takeBooksRequest",
+      through: "take_books_requests",
+
+      // source
+      foreignKey: "bookId",
+      //>>>>>>>>
+      // target (on join table)
+      otherKey: "requestId",
+      // otherKey: "bookId",
+
+      timestamps: false
+    });
+
+    // TRADE TABLE
+
+    Book.belongsToMany(models.Trade, {
+      as: "giveBooksTrade",
+      through: "give_books_trades",
+      // source
+      foreignKey: "bookId",
+
+      // target (on join table)
+      otherKey: "tradeId",
+      timestamps: false
+    });
+
+    Book.belongsToMany(models.Trade, {
+      as: "takeBooksTrade",
+      through: "take_books_trades",
+      // source
+      foreignKey: "bookId",
+
+      // target (on join table)
+      otherKey: "tradeId",
+      timestamps: false
+    });
   };
   return Book;
 };

@@ -17,26 +17,53 @@ module.exports = (sequelize, DataTypes) => {
 
     // Attribute: giveBooksId
     Trade.belongsToMany(models.Book, {
-      as: "giveBooks",
-      through: "giveBooks_trades"
+      as: "giveBooksTrade",
+      through: "give_books_trades",
+
+      // source
+      foreignKey: "tradeId",
+
+      // target (on join table)
+      otherKey: "bookId",
+
+      timestamps: false
     });
 
     // Attribute: takeBooksId
     Trade.belongsToMany(models.Book, {
-      as: "takeBooks",
-      through: "takeBooks_trades"
+      as: "takeBooksTrade",
+      through: "take_books_trades",
+
+      // source
+      foreignKey: "tradeId",
+
+      // target (on join table)
+      otherKey: "bookId",
+
+      timestamps: false
     });
+
+    // Since the below is not a many-to-many,
+    // there is no join table for them.
 
     // Users who traded.
 
     // requesterId
     Trade.belongsTo(models.User, {
-      as: "requester"
+      as: "requester",
+      // source
+      foreignKey: "requesterId",
+      // target
+      targetKey: "userId"
     });
 
     // requesteeId
     Trade.belongsTo(models.User, {
-      as: "requestee"
+      as: "requestee",
+      // source
+      foreignKey: "requesteeId",
+      // target
+      targetKey: "userId"
     });
   };
   return Trade;
