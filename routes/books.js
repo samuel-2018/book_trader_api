@@ -103,7 +103,8 @@ router
         // URI for the course
         Location: `/api/books/${bookId}`
       });
-      res.end();
+      // Return new bookId
+      res.end(JSON.stringify({ bookId }));
     } catch (error) {
       // Catches validation errors sent from Sequelize
       if (error.name === "SequelizeValidationError") {
@@ -235,5 +236,62 @@ router
       next(error);
     }
   });
+
+// ROUTE - api/books/query/:queryArray
+// GET - List of books
+router.get("/query/:queryList", async (req, res, next) => {
+  try {
+    // Converts the text into an array
+    const queryArray = req.params.queryList.split(",");
+    const queryArryInt = queryArray.map(char => {
+      return parseInt(char);
+    });
+
+    const result = await Book.findAll({
+      where: { bookId: { [Op.in]: queryArryInt } },
+
+      attributes: ["bookId", "title", "author", "ownerId"],
+      include: [
+        // Includes the book owner's username and location
+        {
+          model: User,
+          as: "owner",
+          attributes: ["username", "country", "state", "city"]
+        },
+
+        // Requests for book
+        {
+          model: Request,
+          as: "takeBooksRequest",
+          attributes: ["requesterId"],
+
+          // Removes extra join table info
+          through: { attributes: [] },
+
+          include: [
+            // Usernames of requesters
+            {
+              model: User,
+              as: "requester",
+              attributes: ["username"]
+            }
+          ]
+        }
+      ]
+    });
+
+    if (result) {
+      // Returns list
+      res.status(200).json(result);
+    } else {
+      // Error: Books not found
+      const booksNotFound = new Error("Books not found.");
+      booksNotFound.status = 404;
+      next(booksNotFound);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
