@@ -41,7 +41,7 @@ router.get("/", async (req, res, next) => {
           model: Book,
           as: "giveBooksTrade",
           through: "give_books_tradess",
-          attributes: ["title", "author", "createdAt"],
+          attributes: ["bookId", "title", "author", "createdAt"],
           include: [
             // Includes the book owner's username and location
             {
@@ -77,7 +77,7 @@ router.get("/", async (req, res, next) => {
           model: Book,
           as: "takeBooksTrade",
           through: "take_books_trades",
-          attributes: ["title", "author", "createdAt"],
+          attributes: ["bookId", "title", "author", "createdAt"],
           include: [
             // Includes the book owner's username and location
             {

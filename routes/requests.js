@@ -65,7 +65,7 @@ router
             model: Book,
             as: "giveBooksRequest",
             through: "give_books_requests",
-            attributes: ["title", "author", "createdAt"],
+            attributes: ["bookId", "title", "author", "createdAt"],
             include: [
               // Includes the book owner's username and location
               {
@@ -101,7 +101,7 @@ router
             model: Book,
             as: "takeBooksRequest",
             through: "take_books_requests",
-            attributes: ["title", "author", "createdAt"],
+            attributes: ["bookId", "title", "author", "createdAt"],
             include: [
               // Includes the book owner's username and location
               {
@@ -275,7 +275,7 @@ router.get("/book/:bookId", async (req, res, next) => {
           model: Book,
           as: "giveBooksRequest",
           through: "give_books_requests",
-          attributes: ["title", "author", "createdAt"],
+          attributes: ["bookId", "title", "author", "createdAt"],
           include: [
             // Includes the book owner's username and location
             {
@@ -311,7 +311,7 @@ router.get("/book/:bookId", async (req, res, next) => {
           model: Book,
           as: "takeBooksRequest",
           through: "take_books_requests",
-          attributes: ["title", "author", "createdAt"],
+          attributes: ["bookId", "title", "author", "createdAt"],
           include: [
             // Includes the book owner's username and location
             {
@@ -380,7 +380,7 @@ router
             model: Book,
             as: "giveBooksRequest",
             through: "give_books_requests",
-            attributes: ["title", "author", "createdAt"],
+            attributes: ["bookId", "title", "author", "createdAt"],
             include: [
               // Includes the book owner's username and location
               {
@@ -416,7 +416,7 @@ router
             model: Book,
             as: "takeBooksRequest",
             through: "take_books_requests",
-            attributes: ["title", "author", "createdAt"],
+            attributes: ["bookId", "title", "author", "createdAt"],
             include: [
               // Includes the book owner's username and location
               {
