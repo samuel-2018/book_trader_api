@@ -40,8 +40,25 @@ app.use((err, req, res, next) => {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
   }
 
+  let validationErrors = null;
+  if (err.errors && err.name === "SequelizeValidationError") {
+    validationErrors = err.errors.map((error, index) => {
+      return {
+        message: error.message,
+        type: error.type,
+        path: error.path,
+        validatorName: error.validatorName
+      };
+    });
+  }
+
   res.status(err.status || 500).json({
-    message: err.message
+    message: err.message,
+    // Important: This is required for
+    // the client to identify a validation
+    // error.
+    name: err.name,
+    validationErrors
     // error: {},
   });
 });
