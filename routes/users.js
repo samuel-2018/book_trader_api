@@ -118,7 +118,6 @@ router.get("/:userId", async (req, res, next) => {
       userNotFound.status = 404;
       next(userNotFound);
     }
-    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
