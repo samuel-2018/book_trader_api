@@ -20,7 +20,8 @@ router.get("/", async (req, res, next) => {
   try {
     const result = await Trade.findAll({
       attributes: { exclude: ["updatedAt"] },
-
+      // Newest will be displayed by client first.
+      order: [["createdAt", "DESC"]],
       include: [
         // Requester
         {
