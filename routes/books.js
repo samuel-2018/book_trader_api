@@ -56,7 +56,7 @@ router
           {
             model: Request,
             as: "takeBooksRequest",
-            attributes: ["requesterId"],
+            attributes: ["requestId", "requesterId"],
 
             // Removes extra join table info
             through: { attributes: [] },
@@ -137,7 +137,7 @@ router.get("/owner/:ownerId", async (req, res, next) => {
         {
           model: Request,
           as: "takeBooksRequest",
-          attributes: ["requesterId"],
+          attributes: ["requestId", "requesterId"],
 
           // Removes extra join table info
           through: { attributes: [] },
@@ -154,7 +154,7 @@ router.get("/owner/:ownerId", async (req, res, next) => {
       ]
     });
 
-    if (result) {
+    if (result.length) {
       // Returns list
       res.status(200).json(result);
     } else {
@@ -263,7 +263,7 @@ router.get("/query/:queryList", async (req, res, next) => {
         {
           model: Request,
           as: "takeBooksRequest",
-          attributes: ["requesterId"],
+          attributes: ["requestId", "requesterId"],
 
           // Removes extra join table info
           through: { attributes: [] },
