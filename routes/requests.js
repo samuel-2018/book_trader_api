@@ -77,7 +77,7 @@ router
               {
                 model: Request,
                 as: "takeBooksRequest",
-                attributes: ["requesterId"],
+                attributes: ["requestId", "requesterId"],
 
                 // Removes extra join table info
                 through: { attributes: [] },
@@ -113,7 +113,7 @@ router
               {
                 model: Request,
                 as: "takeBooksRequest",
-                attributes: ["requesterId"],
+                attributes: ["requestId", "requesterId"],
 
                 // Removes extra join table info
                 through: { attributes: [] },
@@ -287,7 +287,7 @@ router.get("/book/:bookId", async (req, res, next) => {
             {
               model: Request,
               as: "takeBooksRequest",
-              attributes: ["requesterId"],
+              attributes: ["requestId", "requesterId"],
 
               // Removes extra join table info
               through: { attributes: [] },
@@ -323,7 +323,7 @@ router.get("/book/:bookId", async (req, res, next) => {
             {
               model: Request,
               as: "takeBooksRequest",
-              attributes: ["requesterId"],
+              attributes: ["requestId", "requesterId"],
 
               // Removes extra join table info
               through: { attributes: [] },
@@ -392,7 +392,7 @@ router
               {
                 model: Request,
                 as: "takeBooksRequest",
-                attributes: ["requesterId"],
+                attributes: ["requestId", "requesterId"],
 
                 // Removes extra join table info
                 through: { attributes: [] },
@@ -428,7 +428,7 @@ router
               {
                 model: Request,
                 as: "takeBooksRequest",
-                attributes: ["requesterId"],
+                attributes: ["requestId", "requesterId"],
 
                 // Removes extra join table info
                 through: { attributes: [] },
