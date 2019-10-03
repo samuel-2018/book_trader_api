@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   Trade.associate = function(models) {
     // Books traded.
 
-    // Attribute: giveBooksId
+    // Attributes on join table "giveBooksTrade":
+    // bookId, tradeId
     Trade.belongsToMany(models.Book, {
       as: "giveBooksTrade",
       through: "give_books_trades",
@@ -29,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false
     });
 
-    // Attribute: takeBooksId
+    // Attributes on join table "takeBooksTrade":
+    // bookId, tradeId
     Trade.belongsToMany(models.Book, {
       as: "takeBooksTrade",
       through: "take_books_trades",

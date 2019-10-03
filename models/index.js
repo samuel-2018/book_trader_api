@@ -20,9 +20,9 @@ if (config.use_env_variable) {
   );
 }
 
-// For development use?
+// For development use.
 // needed after making changes to associations.
-sequelize.sync();
+// sequelize.sync();
 
 // For development use.
 // Delete tables and recreates them.
@@ -45,6 +45,7 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
+// Note: Couldn't get the default setup to work.
 // db.sequelize = sequelize;
 // db.Sequelize = Sequelize;
 

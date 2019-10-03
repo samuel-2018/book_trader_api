@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   Request.associate = function(models) {
     // Books being traded.
 
-    // Attribute: giveBooksId
+    // Attributes on join table "giveBooksRequest":
+    // bookId, requestId
     Request.belongsToMany(models.Book, {
       as: "giveBooksRequest",
       through: "give_books_requests",
@@ -29,14 +30,14 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false
     });
 
-    // Attribute: takeBooksId
+    // Attributes on join table "takeBooksRequest":
+    // bookId, requestId
     Request.belongsToMany(models.Book, {
       as: "takeBooksRequest",
       through: "take_books_requests",
 
       // source
       foreignKey: "requestId",
-      //>>>>>>>>>>>>
       // target (on join table)
       otherKey: "bookId",
       // otherKey: "requestId",

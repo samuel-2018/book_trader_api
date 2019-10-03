@@ -88,7 +88,7 @@ router
       // IMPORTANT: This prevents a user from saving data to someone else's account.
       req.body.ownerId = userId;
 
-      // TODO testing somwething?
+      // TODO testing something?
       // req.body.owner = 2;
 
       console.log("req.body: ", req.body);

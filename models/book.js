@@ -71,7 +71,6 @@ module.exports = (sequelize, DataTypes) => {
 
       // source
       foreignKey: "bookId",
-      //>>>>>>>>
       // target (on join table)
       otherKey: "requestId",
       // otherKey: "bookId",
