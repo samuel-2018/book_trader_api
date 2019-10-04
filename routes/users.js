@@ -15,6 +15,10 @@ const { User } = db;
 // Authentication
 const authenticateUser = require("../helpers/authenticateUser");
 
+// Sequelize operators
+const Sequelize = require("sequelize");
+const { Op } = Sequelize;
+
 // ========================================
 // ROUTES
 // ========================================
@@ -44,6 +48,12 @@ router.use([
 router.get("/all", async (req, res, next) => {
   try {
     const result = await User.findAll({
+      // Excludes 'Archive' (userId 1)
+      where: {
+        userId: {
+          [Op.ne]: 1
+        }
+      },
       attributes: { exclude: ["createdAt", "updatedAt", "password", "email"] }
     });
     res.status(200).json(result);
