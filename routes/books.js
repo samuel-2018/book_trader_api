@@ -7,7 +7,7 @@ const { body, param } = require("express-validator");
 
 // Database access
 const { db } = require("../models");
-const { Book, Request, User } = db;
+const { Book, Request, User, Trade } = db;
 
 // Sequelize operators
 const Sequelize = require("sequelize");
@@ -43,6 +43,12 @@ router
   .get(async (req, res, next) => {
     try {
       const result = await Book.findAll({
+        // Excludes books owned by 'Archive' (userId 1)
+        where: {
+          ownerId: {
+            [Op.ne]: 1
+          }
+        },
         attributes: ["bookId", "title", "author", "ownerId"],
         include: [
           // Includes the book owner's username and location
@@ -194,9 +200,6 @@ router
 
   // DELETE - One book
   .delete(authenticateUser, async (req, res, next) => {
-    // TODO
-    // Delete all requests that mention this book
-
     try {
       // Get book
       const book = await Book.findByPk(req.params.bookId);
@@ -212,8 +215,93 @@ router
         // AUTHORIZE
         // Is this the owner of the book?
         if (ownerId === userId) {
-          // Delete
-          await book.destroy();
+          // Note: Deleting a book requires some cleanup.
+          // All Requests need deleted that mention the book.
+          // (Otherwise, the book would simply disappear from the request.)
+          // Also, if the book is mentioned in a trade record,
+          // it can't be deleted. Instead, ownership needs to
+          // be changed to 'Archive.'
+          // (Otherwise, the book would simply disappear from the trade record.)
+
+          // >> DESTROY REQUEST RECORDS
+
+          // Delete all requests with matching books
+
+          // Get array of requests to destroy
+          const requestsToDestroy = await Request.findAll({
+            where: {
+              [Op.or]: [
+                {
+                  "$takeBooksRequest.bookId$": req.params.bookId
+                },
+                {
+                  "$giveBooksRequest.bookId$": req.params.bookId
+                }
+              ]
+            },
+            // This 'include' scope is for the current
+            // return request.
+            include: [
+              {
+                model: Book,
+                as: "takeBooksRequest"
+              },
+              {
+                model: Book,
+                as: "giveBooksRequest"
+              }
+            ]
+          });
+
+          // Destroy requests
+          requestsToDestroy.forEach(request => {
+            request.destroy();
+          });
+
+          // << END DESTROY REQUEST RECORDS
+
+          // >> DELETE BOOK OR CHANGE OWNERSHIP TO ARCHIVE
+
+          // Look for trade records that include this book
+          const tradeRecordsWithBook = await Trade.findAll({
+            where: {
+              [Op.or]: [
+                {
+                  "$takeBooksTrade.bookId$": req.params.bookId
+                },
+                {
+                  "$giveBooksTrade.bookId$": req.params.bookId
+                }
+              ]
+            },
+            // This 'include' scope is for the current
+            // return request.
+            include: [
+              {
+                model: Book,
+                as: "takeBooksTrade"
+              },
+              {
+                model: Book,
+                as: "giveBooksTrade"
+              }
+            ]
+          });
+
+          // No trade records with matching bookId.
+          // Safe to delete.
+          if (tradeRecordsWithBook.length === 0) {
+            console.log(" No trade records with matching bookId");
+            // Delete
+            await book.destroy();
+          } else {
+            console.log("There are trade records with matching bookId.");
+            // There are trade records with matching bookId.
+            // Don't delete.
+            // Change ownership of book to Archive.
+            await book.update({ ownerId: 1 });
+          }
+          // << END DELETE BOOK OR CHANGE OWNERSHIP TO ARCHIVE
         } else {
           // Not owner
           // Error: Forbidden
