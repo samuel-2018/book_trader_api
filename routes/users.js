@@ -113,24 +113,68 @@ router
   });
 
 // ROUTE - api/users/:userId
-// GET - One user (profile)
-router.get("/:userId", async (req, res, next) => {
-  try {
-    const result = await User.findByPk(req.params.userId, {
-      attributes: { exclude: ["createdAt", "updatedAt", "password", "email"] }
-    });
-    if (result) {
-      // Returns user profile
-      res.status(200).json(result);
-    } else {
-      // Error: User not found
-      const userNotFound = new Error("User not found.");
-      userNotFound.status = 404;
-      next(userNotFound);
+
+router
+  .route("/:userId")
+  // GET - One user (profile)
+  .get(async (req, res, next) => {
+    try {
+      const result = await User.findByPk(req.params.userId, {
+        attributes: { exclude: ["createdAt", "updatedAt", "password", "email"] }
+      });
+      if (result) {
+        // Returns user profile
+        res.status(200).json(result);
+      } else {
+        // Error: User not found
+        const userNotFound = new Error("User not found.");
+        userNotFound.status = 404;
+        next(userNotFound);
+      }
+    } catch (error) {
+      next(error);
     }
-  } catch (error) {
-    next(error);
-  }
-});
+  })
+
+  // PUT - Updates user (profile)
+  .put(authenticateUser, async (req, res, next) => {
+    try {
+      // Get current authenticated user
+      const userId = await req.currentUser.dataValues.userId;
+
+      // Do the authenticated user id and parm id match?
+      // (This check could be skipped, but it seems more
+      // thorough and consistent to also have the param id
+      // in the url and then check it.)
+      if (parseInt(req.params.userId) === userId) {
+        // Gets user instance
+        const userInstance = await User.findByPk(req.params.userId);
+
+        // Note: Sequalize 'update' doesn't reliably validate.
+        // User needs 'built' and then manually validated
+        // before calling update.
+
+        // Builds updated user with client sent data
+        const updatedUser = await User.build(req.body);
+        // Validates manually.
+        await updatedUser.validate();
+
+        // Hashes password
+        req.body.password = await bcryptjs.hashSync(req.body.password);
+
+        // Update
+        await userInstance.update(req.body);
+        // Success
+        res.status(204).end();
+      } else {
+        // Error: Forbidden
+        const forbidden = new Error("Forbidden.");
+        forbidden.status = 403;
+        next(forbidden);
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
 
 module.exports = router;
