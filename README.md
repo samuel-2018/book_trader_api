@@ -1,4 +1,48 @@
-# book_trader_api DRAFT
+# API: Manage a Book Trading Club
+
+See [the Client’s](https://github.com/samuel-2018/book_trader_client) README.md file for the project description.
+
+## Getting Started
+
+This API requires a MySQL database. You can [download MySQL Workbench](https://dev.mysql.com/downloads/) to setup and run the database.
+
+After creating the database, add a ‘config’ folder in the root of the project. In the folder, add a ‘config.json’ file. The contents of the file should look something like this:
+
+```
+{
+  "development": {
+    "username": "root",
+    "password": "thePasswordYouChose",
+    "database": "theNameOfYourDatabase",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+}
+```
+
+To get up and running with this project, run the following commands from the root of the folder that contains this README file.
+
+First, install the project's dependencies using `npm`.
+
+```
+npm install
+```
+
+Second, seed the database with the Archive user\*.
+
+```
+npx sequelize db:seed:all
+```
+
+And lastly, start the application.
+
+```
+npm start
+```
+
+To test the Express server, browse to the URL [http://localhost:5000/](http://localhost:5000/).
+
+\*The API depends upon user #1 serving as an archive. In a situation where a user deletes a book and that book is also part of a trade record, the ownership of the book goes to the archive user. That allows the book data to persist.
 
 ## API Reference
 
@@ -78,6 +122,31 @@
 }
 ```
 
+## Required fields: firstName, lastName, country, username, password
+
+### Update a user account
+
+#### HTTP METHOD Route
+
+`PUT /api/users/:userId`
+
+#### Request body
+
+```
+{
+  "firstName": "Joe",
+  "lastName": "Smith",
+  "email": "joe@smith.com",
+  "username": "JoeS",
+  "country": "United States",
+  "state": "Ohio",
+  "city": "Columbus",
+  "password": "pass"
+}
+```
+
+Required fields: firstName, lastName, country, username.
+
 ---
 
 ### Get all books
@@ -86,13 +155,44 @@
 
 `GET /api/books`
 
+#### Response body
+
+```
+[
+  {
+    "bookId": 1,
+    "title": "A great book 1",
+    "author": "John Author",
+    "ownerId": 2,
+    "owner": {
+        "username": "SallyJ",
+        "country": "United States",
+        "state": "Ohio",
+        "city": "Columbus"
+    },
+    "takeBooksRequest": [
+        {
+            "requestId": 9,
+            "requesterId": 1,
+            "requester": {
+                "username": "JoeS"
+            }
+        }
+    ]
+  },
+  {
+    ...
+  }
+]
+```
+
 ---
 
 ### Get one book
 
 #### HTTP METHOD Route
 
-`GET /api/books/:id`
+`GET /api/books/:bookId`
 
 #### Response body
 
@@ -122,33 +222,19 @@
 
 #### HTTP METHOD Route
 
-`GET /api/books/:ownerId`
+`GET /api/books/owner/:ownerId`
 
 #### Response body
 
 ```
 [
   {
-    "bookId": 1,
-    "title": "A great book 1",
-    "author": "John Author",
-    "ownerId": 2,
-    "owner": {
-        "username": "SallyJ",
-        "country": "United States",
-        "state": "Ohio",
-        "city": "Columbus"
-    },
-    "takeBooksRequest": [
-        {
-            "requesterId": 1,
-            "requester": {
-                "username": "JoeS"
-            }
-        }
-    ]
-  },
+      ...
+  }
 ]
+
+*See "Get all books" example.*
+
 ```
 
 ---
@@ -170,7 +256,10 @@
    "condition": "Used",
    "comments": "This is a great book!",
 }
+
 ```
+
+Route requires authentication.
 
 ---
 
@@ -205,6 +294,7 @@
     },
     "giveBooksTrade": [
       {
+        "bookId": 2,
         "title": "A wonderful book 2",
         "author": "John Author",
         "createdAt": "2019-09-17T22:51:03.000Z",
@@ -232,6 +322,7 @@
     ],
     "takeBooksTrade": [
       {
+        "bookId": 4,
         "title": "A wonderful book 4",
         "author": "John Author",
         "createdAt": "2019-09-18T03:13:28.000Z",
@@ -279,6 +370,7 @@
       },
       "giveBooksRequest": [
           {
+              "bookId": 4,
               "title": "A wonderful book 4",
               "author": "John Author",
               "createdAt": "2019-09-18T03:13:28.000Z",
@@ -292,13 +384,11 @@
           },
           {
               ...
-          },
-          {
-              ...
           }
       ],
       "takeBooksRequest": [
           {
+             "bookId": 1,
               "title": "A great book 1",
               "author": "John Author",
               "createdAt": "2019-09-17T22:50:45.000Z",
@@ -310,6 +400,7 @@
               },
               "takeBooksRequest": [
                   {
+                      "requestId": 21,
                       "requesterId": 1,
                       "requester": {
                           "username": "JoeS"
@@ -319,9 +410,6 @@
           },
           {
              ...
-          },
-          {
-              ...
           }
       ]
   },
@@ -345,7 +433,7 @@
     }
 ]
 
-See "Get all requests" example.
+*See "Get all requests" example.*
 
 ```
 
@@ -363,7 +451,7 @@ See "Get all requests" example.
     ...
 }
 
-See "Get all requests" example.
+*See "Get all requests" example.*
 
 ```
 
@@ -375,19 +463,23 @@ See "Get all requests" example.
 
 `DELETE /api/requests/:requestId`
 
+Route requires authentication.
+
 ---
 
-### Accept  a request
+### Accept a request
 
 #### HTTP METHOD Route
 
 `DELETE /api/requests/accept/:requestId`
 
-This is only allowed by Sequelize if the current authenticated user id matches that of the requestee on the request.
+Route requires authentication.
 
-- Sequelize will take several actions:
+Accepting is only allowed by Sequelize if the current authenticated user id matches that of the requestee on the request.
 
-- Add the request to the Trade records.
+Sequelize will take several actions:
+
+- Add the request to the trade records.
 
 - Change ownership of books that are in the request.
 
