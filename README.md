@@ -46,8 +46,6 @@ To test the Express server, browse to the URL [http://localhost:5000/](http://lo
 
 ## API Reference
 
----
-
 ### Get all users
 
 #### HTTP METHOD Route
@@ -122,7 +120,9 @@ To test the Express server, browse to the URL [http://localhost:5000/](http://lo
 }
 ```
 
-## Required fields: firstName, lastName, country, username, password
+Required fields: firstName, lastName, country, username, password
+
+---
 
 ### Update a user account
 
@@ -233,9 +233,10 @@ Required fields: firstName, lastName, country, username.
   }
 ]
 
-*See "Get all books" example.*
 
 ```
+
+_See "Get all books" example._
 
 ---
 
@@ -433,9 +434,11 @@ Route requires authentication.
     }
 ]
 
-*See "Get all requests" example.*
-
 ```
+
+_See "Get all requests" example._
+
+---
 
 ### Get one request
 
@@ -451,9 +454,9 @@ Route requires authentication.
     ...
 }
 
-*See "Get all requests" example.*
-
 ```
+
+_See "Get all requests" example._
 
 ---
 
